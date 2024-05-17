@@ -1,0 +1,12 @@
+# HELP jvm_memory_bytes_used Used bytes of a given JVM memory area.
+# TYPE jvm_memory_bytes_used gauge
+jvm_memory_bytes_used{area="heap",} 7858829004
+jvm_memory_bytes_used{area="nonheap",} 3060433834
+# HELP jvm_memory_pool_bytes_used Used bytes of a given JVM memory pool.
+# TYPE jvm_memory_pool_bytes_used gauge
+jvm_memory_pool_bytes_used{pool="Code Cache",} 124618872
+jvm_memory_pool_bytes_used{pool="Metaspace",} 185558617
+jvm_memory_pool_bytes_used{pool="Compressed Class Space",} 930865835
+jvm_memory_pool_bytes_used{pool="PS Eden Space",} 676226196
+jvm_memory_pool_bytes_used{pool="PS Survivor Space",} 916660582
+jvm_memory_pool_bytes_used{pool="PS Old Gen",} 958647665

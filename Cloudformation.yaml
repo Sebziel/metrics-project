@@ -1,0 +1,68 @@
+Resources:
+  MyEC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t2.medium
+      ImageId: ami-0e001c9271cf7f3b9 # Replace with the actual AMI ID for Ubuntu
+      SecurityGroups:
+        - !Ref InstanceSecurityGroup
+      UserData:
+        Fn::Base64: 
+          !Sub |
+            #!/bin/bash -xe
+            apt-get update -y
+            wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
+            echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | tee /etc/apt/sources.list.d/elastic-7.x.list
+            apt-get update && apt-get install elasticsearch
+            IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
+            echo "IP is: $IP"
+            echo "network.host: $IP" >> /etc/elasticsearch/elasticsearch.yml
+            echo "node.name: node-1" >> /etc/elasticsearch/elasticsearch.yml
+            echo "discovery.type: single-node" >> /etc/elasticsearch/elasticsearch.yml
+            echo "cluster.name: Metrics-project" >> /etc/elasticsearch/elasticsearch.yml
+            systemctl start elasticsearch.service
+            apt-get install kibana
+            echo "server.host: $IP" >> /etc/kibana/kibana.yml
+            echo "elasticsearch.hosts: http://$IP:9200" >> /etc/kibana/kibana.yml
+            systemctl start kibana
+            apt-get install metricbeat apt-transport-https python3-pip stress -y
+            sed -i "s/#host: \"localhost:5601\"/host: \"http:\/\/$IP:5601\"/g" /etc/metricbeat/metricbeat.yml
+            sed -i "s/hosts: \[\"localhost:9200\"\]/hosts: \[\"$IP:9200\"\]/g" /etc/metricbeat/metricbeat.yml
+            metricbeat modules enable prometheus
+            sed -i "s/hosts: \[\"localhost:9090\"\]/hosts: \[\"localhost:80\"\]/g" /etc/metricbeat/modules.d/prometheus.yml
+            echo "- module: prometheus" >> /etc/metricbeat/modules.d/prometheus.yml
+            echo "  period: 10s" >> /etc/metricbeat/modules.d/prometheus.yml
+            echo "  hosts: ["localhost:80"]" >> /etc/metricbeat/modules.d/prometheus.yml
+            echo "  metrics_path: /metrics/gc" >> /etc/metricbeat/modules.d/prometheus.yml
+            systemctl start metricbeat
+            echo "Loading Dashboard from metricbeat to kibana"
+            sleep 15
+            metricbeat setup --dashboards
+            
+
+
+  InstanceSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Security Group for instance
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 9200
+          ToPort: 9200
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 9300
+          ToPort: 9300
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 5601
+          ToPort: 5601
+          CidrIp: 0.0.0.0/0

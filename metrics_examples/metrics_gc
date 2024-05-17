@@ -1,0 +1,6 @@
+# HELP jvm_gc_collection_seconds Time spent in a given JVM garbage collector in seconds.
+# TYPE jvm_gc_collection_seconds summary
+jvm_gc_collection_seconds_count{gc="PS Scavenge",} 97373
+jvm_gc_collection_seconds_count{gc="PS MarkSweep",} 316
+jvm_gc_collection_seconds_sum{gc="PS Scavenge",} 2484
+jvm_gc_collection_seconds_sum{gc="PS MarkSweep",} 8415
