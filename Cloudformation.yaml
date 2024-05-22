@@ -3,6 +3,9 @@ Resources:
     Type: 'AWS::EC2::Instance'
     Properties:
       InstanceType: t2.medium
+      Tags:
+      - Key: Name
+        Value: elkStack
       ImageId: ami-0e001c9271cf7f3b9 # Replace with the actual AMI ID for Ubuntu
       SecurityGroups:
         - !Ref InstanceSecurityGroup

@@ -21,3 +21,9 @@ The script for installation used in AWS CF is described in more detail in the `t
 ## Results
 
 An expected outcome is default server metrics, along with kibana dashbaords out-of-the-box and random values of metrics genereted by python http server. 
+
+
+### Usefull commands:
+
+Stack creation: 
+aws cloudformation create-stack --stack-name metrics --template-body file://Cloudformation.yaml
