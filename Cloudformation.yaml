@@ -1,5 +1,5 @@
 Resources:
-  MyEC2Instance:
+  MyELKInstance:
     Type: 'AWS::EC2::Instance'
     Properties:
       InstanceType: t2.medium
@@ -42,6 +42,32 @@ Resources:
             sleep 15
             metricbeat setup --dashboards
             
+  MyJavaInstance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t2.medium
+      Tags:
+      - Key: Name
+        Value: JavaApp
+      ImageId: ami-0e001c9271cf7f3b9 # Replace with the actual AMI ID for Ubuntu
+      SecurityGroups:
+        - !Ref InstanceSecurityGroup
+      UserData:
+        Fn::Base64: 
+          !Sub |
+            #!/bin/bash -xe
+            apt-get update -y
+            wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
+            echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | tee /etc/apt/sources.list.d/elastic-7.x.list
+            apt-get update -y
+            apt-get install nano iputils-ping dnsutils openjdk-17-jdk maven git curl metricbeat -y >> /home/ubuntu/tools_install.log
+            cd /home/ubuntu/
+            git clone https://github.com/spring-projects/spring-petclinic.git >> /home/ubuntu/git_clone.log
+            echo "Running pwd and ls":
+            pwd
+            ls -ltr
+            cd spring-petclinic
+            ./mvnw package >> /home/ubuntu/mvn.log
 
 
   InstanceSecurityGroup:
@@ -53,6 +79,10 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0          
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
