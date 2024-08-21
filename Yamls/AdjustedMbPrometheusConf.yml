@@ -1,7 +1,6 @@
-#Wszystkie parametry wymagane do modyfikacji zachowania metricbeata i prometheusa.
+#All parameters required for to run metricbeat and prometheus properly.
 
 - module: prometheus
-#Wartość Period okreslja jak czesto metricbeat uderza po metryke z danego endpointu
   period: 10s
   hosts: ["localhost:80"]
   metrics_path: /metrics
@@ -10,7 +9,7 @@
     include: ["jvm_memory_pool_*"]
     exclude: []
 
-#Ponizej przykłąd wyciągania danych z innego endpoint'u. 
+#Below Example of a different endpoint
 - module: prometheus
   period: 10s
   hosts: ["localhost:80"]

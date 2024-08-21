@@ -1,5 +1,6 @@
-#Poniżej pełna dostosowana konfiguracja dla pliku metricbeat.yml, wszystko jest z default'u 
-#zmian wymagają wyłącznie Adresy IP kibany i elasticsearch
+#below example of adjusted config for metricbeat.yml, most of the things come with defaults out-of-the-box. 
+#Required changes are only for IP of Kibana and Elasticsearch. 
+
 
 metricbeat.config.modules:
   path: ${path.config}/modules.d/*.yml
@@ -8,9 +9,9 @@ setup.template.settings:
   index.number_of_shards: 1
   index.codec: best_compression
 setup.kibana:
-  host: "http://{TuPodajemyIPKibany}:5601"
+  host: "http://{KibanaIPHere}:5601"
 output.elasticsearch:
-  hosts: ["{TuPodajemyIPElasticsearcha}:9200"]
+  hosts: ["{ElasticsearchIpHere}:9200"]
 processors:
   - add_host_metadata: ~
   - add_cloud_metadata: ~
